@@ -113,7 +113,6 @@ def copy_object(orig,
                     continue
             recurse(child, copy, depth + 1)
         return copy
-
     return recurse(orig, root_parent, 0)
 
 
@@ -175,7 +174,12 @@ def delete_object(existing: bpy.types.Object):
     bpy.ops.object.delete()
 
 
-def get_or_create_collection(name: str, parent: bpy.types.Collection = bpy.context.collection, replace=False):
+def get_or_create_collection(
+        name: str,
+        parent: bpy.types.Collection = None,
+        replace=False):
+    if not parent:
+        parent = bpy.context.collection
     existing = parent.children.get(name)
     if existing:
         if replace:

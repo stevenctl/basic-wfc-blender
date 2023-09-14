@@ -15,7 +15,7 @@ def collinear(p1, p2, p3, ignore=-1):
     return a*(n - y) + m*(y - b) + x*(b - n) == 0
 
 
-def optimize_2d_mesh(verts, edges, ignore=-1):
+def optimize_2d_mesh(verts, edges, ignore_axis=-1):
     # immutable input
     verts = copy.deepcopy(verts)
     edges = copy.deepcopy(edges)
@@ -53,7 +53,7 @@ def optimize_2d_mesh(verts, edges, ignore=-1):
         # can only check collinear for a group of 3
         if i in edge_map and len(edge_map[i]) == 2:
             j, k = edge_map[i]
-            if collinear(verts[i], verts[j], verts[k], ignore=ignore):
+            if collinear(verts[i], verts[j], verts[k], ignore=ignore_axis):
                 edge_map = remove_vert(i)
                 oj, ok = j, k
                 j = j if j < i else j - 1
@@ -90,7 +90,7 @@ def test():
     ]
 
     EDGES = [(1, 0), (0, 2)]
-    verts, edges = optimize_2d_mesh(VERTS, EDGES, ignore=1)
+    verts, edges = optimize_2d_mesh(VERTS, EDGES, ignore_axis=1)
     print(VERTS)
     print(EDGES)
     print("to")

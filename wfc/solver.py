@@ -114,7 +114,7 @@ class Cell:
 
     @staticmethod
     def _symmetrical(sock):
-        return sock.endswith("s") or sock == "empty" or sock == "empty_only"
+        return sock.endswith("s") or "empty" in sock
 
     def allowed_sockets(self, face: str) -> set[str]:
         out = set()
@@ -498,14 +498,6 @@ class Solver:
         )
 
 
-rotation_delta = {
-    0: (0, 0),
-    90: (1, 0),
-    180: (1, 1),
-    270: (0, 1),
-}
-
-
 class Renderer:
     tile_size: float
     parent_collection: Collection
@@ -583,10 +575,7 @@ class Renderer:
             )
 
             if proto:
-                render_obj.rotation_euler = (0, 0, math.radians(proto.rotation))
-                # delta = rotation_delta[proto.rotation]
-                # render_obj.location[0] += delta[0] * self.tile_size
-                # render_obj.location[1] += delta[1] * self.tile_size
+                render_obj.rotation_euler = (0, 0, math.radians(proto.rotation * 90))
 
             # Strip out debug data from the source mesh object
             # TODO figure out if there is a way to share mesh data but also change custom properties...
@@ -611,7 +600,7 @@ class Renderer:
 
 def test(iterations=1000, s=None):
     if not s:
-        grid = Grid((10, 10, 10))
+        grid = Grid((5, 5, 5))
         s = Solver(grid)
     try:
         s.solve(iterations, restart=False)

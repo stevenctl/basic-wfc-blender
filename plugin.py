@@ -13,14 +13,15 @@ class OperatorAdjacencyFromGeo(bpy.types.Operator):
 
     def execute(self, context):
         if not bpy.context.scene.wfc_source_tiles:
-            self.report({'ERROR'}, "must set source tiles")
-            return {'FINISHED'}
+            self.report({"ERROR"}, "must set source tiles")
+            return {"FINISHED"}
         try:
-            from wfc.adjacency_v2 import main as adjacency
-            adjacency(bpy.context.scene.wfc_source_tiles)
+            from wfc.adjacency import compute_adjacency
+
+            compute_adjacency(bpy.context.scene.wfc_source_tiles)
         except Exception as e:
-            self.report({'ERROR'}, e)
-        return {'FINISHED'}
+            self.report({"ERROR"}, e)
+        return {"FINISHED"}
 
 
 class OperatorGenerateRandom(bpy.types.Operator):
@@ -29,14 +30,15 @@ class OperatorGenerateRandom(bpy.types.Operator):
 
     def execute(self, context):
         if not bpy.context.scene.wfc_source_tiles:
-            self.report({'ERROR'}, "must set source tiles")
-            return {'FINISHED'}
+            self.report({"ERROR"}, "must set source tiles")
+            return {"FINISHED"}
         try:
             from wfc.solver import test_with_retry
-            test_with_retry()
+
+            test_with_retry(iterations=1000)
         except Exception as e:
-            self.report({'ERROR'}, e)
-        return {'FINISHED'}
+            self.report({"ERROR"}, e)
+        return {"FINISHED"}
 
 
 class WFCPanel(bpy.types.Panel):
@@ -53,15 +55,18 @@ class WFCPanel(bpy.types.Panel):
 
     def draw(self, context):
         self.layout.prop(context.scene, "wfc_source_tiles")
+        self.layout.prop(context.scene, "wfc_prototypes_path")
         self.layout.operator(OperatorAdjacencyFromGeo.bl_idname)
         self.layout.operator(OperatorGenerateRandom.bl_idname)
 
 
 def register():
-    bpy.types.Scene.wfc_prototypes_path = \
-        bpy.props.PointerProperty(type=bpy.types.Collection)
-    bpy.types.Scene.wfc_source_tiles = \
-        bpy.props.PointerProperty(type=bpy.types.Collection)
+    bpy.types.Scene.wfc_prototypes_path = bpy.props.StringProperty(
+        name="Prototypes JSON"
+    )
+    bpy.types.Scene.wfc_source_tiles = bpy.props.PointerProperty(
+        name="Source Tiles", type=bpy.types.Collection
+    )
 
     bpy.utils.register_class(OperatorAdjacencyFromGeo)
     bpy.utils.register_class(OperatorGenerateRandom)
@@ -78,5 +83,6 @@ if __name__ == "__main__":
     # for local dev
     import os
     import sys
+
     sys.path.append(os.getcwd())
     register()
